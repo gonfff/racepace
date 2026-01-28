@@ -218,11 +218,11 @@ abstract class AppLocalizations {
   /// **'Author'**
   String get settingsAboutAuthor;
 
-  /// No description provided for @settingsAboutProjects.
+  /// No description provided for @settingsAboutSourceCode.
   ///
   /// In en, this message translates to:
   /// **'Source code'**
-  String get settingsAboutProjects;
+  String get settingsAboutSourceCode;
 
   /// No description provided for @settingsAboutTelegram.
   ///
@@ -247,6 +247,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Miles'**
   String get unitMiles;
+
+  /// No description provided for @unitKilometersShort.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get unitKilometersShort;
+
+  /// No description provided for @unitMilesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'mi'**
+  String get unitMilesShort;
+
+  /// No description provided for @unitMetersShort.
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get unitMetersShort;
+
+  /// No description provided for @unitHoursShort.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get unitHoursShort;
 
   /// No description provided for @languageEnglish.
   ///
@@ -283,6 +307,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dark'**
   String get themeDark;
+
+  /// No description provided for @unitMinutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get unitMinutesShort;
+
+  /// No description provided for @calculatorModeSprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sprint'**
+  String get calculatorModeSprint;
+
+  /// No description provided for @calculatorModeLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Stayer'**
+  String get calculatorModeLong;
+
+  /// No description provided for @calculatorDistances.
+  ///
+  /// In en, this message translates to:
+  /// **'Distances'**
+  String get calculatorDistances;
+
+  /// No description provided for @calculatorDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get calculatorDistance;
+
+  /// No description provided for @calculatorPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace'**
+  String get calculatorPace;
+
+  /// No description provided for @calculatorSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get calculatorSpeed;
+
+  /// No description provided for @calculatorTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get calculatorTime;
+
+  /// No description provided for @calculatorTimeFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'h:mm:ss'**
+  String get calculatorTimeFormat;
+
+  /// No description provided for @calculatorCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get calculatorCancel;
+
+  /// No description provided for @calculatorOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get calculatorOk;
+
+  /// No description provided for @calculatorSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get calculatorSave;
+
+  /// No description provided for @calculatorSavedCalculations.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved calculations'**
+  String get calculatorSavedCalculations;
+
+  /// No description provided for @calculatorNoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved calculations yet'**
+  String get calculatorNoSaved;
+
+  /// No description provided for @calculatorSprintMile.
+  ///
+  /// In en, this message translates to:
+  /// **'1 mile'**
+  String get calculatorSprintMile;
 
   /// No description provided for @calculatorPlaceholder.
   ///

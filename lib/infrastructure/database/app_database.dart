@@ -15,12 +15,31 @@ class Settings extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [Settings])
+class Calculations extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  RealColumn get distance => real()();
+  IntColumn get paceSeconds => integer()();
+  IntColumn get timeSeconds => integer()();
+  TextColumn get unit => text()();
+  IntColumn get createdAt => integer()();
+}
+
+@DriftDatabase(tables: [Settings, Calculations])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(calculations);
+      }
+    },
+  );
 
   Future<String?> getSetting(String key) async {
     final row = await (select(

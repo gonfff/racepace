@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAboutAuthor => 'Author';
 
   @override
-  String get settingsAboutProjects => 'Source code';
+  String get settingsAboutSourceCode => 'Source code';
 
   @override
   String get settingsAboutTelegram => 'Telegram';
@@ -82,6 +82,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unitMiles => 'Miles';
+
+  @override
+  String get unitKilometersShort => 'km';
+
+  @override
+  String get unitMilesShort => 'mi';
+
+  @override
+  String get unitMetersShort => 'm';
+
+  @override
+  String get unitHoursShort => 'h';
 
   @override
   String get languageEnglish => 'English';
@@ -100,6 +112,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeDark => 'Dark';
+
+  @override
+  String get unitMinutesShort => 'min';
+
+  @override
+  String get calculatorModeSprint => 'Sprint';
+
+  @override
+  String get calculatorModeLong => 'Stayer';
+
+  @override
+  String get calculatorDistances => 'Distances';
+
+  @override
+  String get calculatorDistance => 'Distance';
+
+  @override
+  String get calculatorPace => 'Pace';
+
+  @override
+  String get calculatorSpeed => 'Speed';
+
+  @override
+  String get calculatorTime => 'Time';
+
+  @override
+  String get calculatorTimeFormat => 'h:mm:ss';
+
+  @override
+  String get calculatorCancel => 'Cancel';
+
+  @override
+  String get calculatorOk => 'OK';
+
+  @override
+  String get calculatorSave => 'Save';
+
+  @override
+  String get calculatorSavedCalculations => 'Saved calculations';
+
+  @override
+  String get calculatorNoSaved => 'No saved calculations yet';
+
+  @override
+  String get calculatorSprintMile => '1 mile';
 
   @override
   String get calculatorPlaceholder => 'Calculator tools will live here.';

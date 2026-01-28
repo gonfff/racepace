@@ -34,28 +34,9 @@ class _SettingsSheetContentState extends State<_SettingsSheetContent> {
       builder: (context, _) {
         final settings = controller.settings;
         final localizations = AppLocalizations.of(context);
-        final unitLabel = switch (settings.unit) {
-          Unit.kilometers => localizations.unitKilometers,
-          Unit.miles => localizations.unitMiles,
-        };
-        final languageLabel = switch (settings.language) {
-          AppLanguage.english => localizations.languageEnglish,
-          AppLanguage.russian => localizations.languageRussian,
-          AppLanguage.system => localizations.languageSystem,
-        };
-        final themeLabel = switch (settings.theme) {
-          AppThemeMode.light => localizations.themeLight,
-          AppThemeMode.dark => localizations.themeDark,
-          AppThemeMode.system => localizations.themeSystem,
-        };
-
         final mediaPadding = MediaQuery.paddingOf(context);
 
         final home = _SettingsHome(
-          localizations: localizations,
-          unitLabel: unitLabel,
-          languageLabel: languageLabel,
-          themeLabel: themeLabel,
           mediaPadding: mediaPadding,
           onClose: _closeSheet,
           onSelectUnit: _selectUnit,
@@ -242,10 +223,6 @@ class _SettingsSheetContentState extends State<_SettingsSheetContent> {
 
 class _SettingsHome extends StatelessWidget {
   const _SettingsHome({
-    required this.localizations,
-    required this.unitLabel,
-    required this.languageLabel,
-    required this.themeLabel,
     required this.mediaPadding,
     required this.onClose,
     required this.onSelectUnit,
@@ -255,10 +232,6 @@ class _SettingsHome extends StatelessWidget {
     required this.onOpenSupport,
   });
 
-  final AppLocalizations localizations;
-  final String unitLabel;
-  final String languageLabel;
-  final String themeLabel;
   final EdgeInsets mediaPadding;
   final VoidCallback onClose;
   final VoidCallback onSelectUnit;
@@ -269,63 +242,86 @@ class _SettingsHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: AppTheme.scaffoldBackgroundColor(context),
-      navigationBar: CupertinoNavigationBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppTheme.scaffoldBackgroundColor(context),
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: onClose,
-          child: Text(localizations.settingsClose),
-        ),
-        middle: Text(localizations.settingsTitle),
-      ),
-      child: ListView(
-        padding: EdgeInsets.only(bottom: 16 + mediaPadding.bottom),
-        children: [
-          CupertinoFormSection.insetGrouped(
-            header: Text(localizations.settingsSectionGeneral),
+    final controller = SettingsScope.of(context);
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final settings = controller.settings;
+        final localizations = AppLocalizations.of(context);
+        final unitLabel = switch (settings.unit) {
+          Unit.kilometers => localizations.unitKilometers,
+          Unit.miles => localizations.unitMiles,
+        };
+        final languageLabel = switch (settings.language) {
+          AppLanguage.english => localizations.languageEnglish,
+          AppLanguage.russian => localizations.languageRussian,
+          AppLanguage.system => localizations.languageSystem,
+        };
+        final themeLabel = switch (settings.theme) {
+          AppThemeMode.light => localizations.themeLight,
+          AppThemeMode.dark => localizations.themeDark,
+          AppThemeMode.system => localizations.themeSystem,
+        };
+
+        return CupertinoPageScaffold(
+          backgroundColor: AppTheme.scaffoldBackgroundColor(context),
+          navigationBar: CupertinoNavigationBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: AppTheme.scaffoldBackgroundColor(context),
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: onClose,
+              child: Text(localizations.settingsClose),
+            ),
+            middle: Text(localizations.settingsTitle),
+          ),
+          child: ListView(
+            padding: EdgeInsets.only(bottom: 16 + mediaPadding.bottom),
             children: [
-              _SettingsTile(
-                label: localizations.settingsBaseUnit,
-                value: unitLabel,
-                onTap: onSelectUnit,
-                showChevron: true,
+              CupertinoFormSection.insetGrouped(
+                header: Text(localizations.settingsSectionGeneral),
+                children: [
+                  _SettingsTile(
+                    label: localizations.settingsBaseUnit,
+                    value: unitLabel,
+                    onTap: onSelectUnit,
+                    showChevron: true,
+                  ),
+                  _SettingsTile(
+                    label: localizations.settingsLanguage,
+                    value: languageLabel,
+                    onTap: onSelectLanguage,
+                    showChevron: true,
+                  ),
+                  _SettingsTile(
+                    label: localizations.settingsTheme,
+                    value: themeLabel,
+                    onTap: onSelectTheme,
+                    showChevron: true,
+                  ),
+                ],
               ),
-              _SettingsTile(
-                label: localizations.settingsLanguage,
-                value: languageLabel,
-                onTap: onSelectLanguage,
-                showChevron: true,
-              ),
-              _SettingsTile(
-                label: localizations.settingsTheme,
-                value: themeLabel,
-                onTap: onSelectTheme,
-                showChevron: true,
+              CupertinoFormSection.insetGrouped(
+                header: Text(localizations.settingsSectionAbout),
+                children: [
+                  _SettingsTile(
+                    label: localizations.settingsAbout,
+                    value: '',
+                    onTap: onOpenAbout,
+                    showChevron: true,
+                  ),
+                  _SettingsTile(
+                    label: localizations.settingsSupport,
+                    value: '',
+                    onTap: onOpenSupport,
+                    showChevron: true,
+                  ),
+                ],
               ),
             ],
           ),
-          CupertinoFormSection.insetGrouped(
-            header: Text(localizations.settingsSectionAbout),
-            children: [
-              _SettingsTile(
-                label: localizations.settingsAbout,
-                value: '',
-                onTap: onOpenAbout,
-                showChevron: true,
-              ),
-              _SettingsTile(
-                label: localizations.settingsSupport,
-                value: '',
-                onTap: onOpenSupport,
-                showChevron: true,
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

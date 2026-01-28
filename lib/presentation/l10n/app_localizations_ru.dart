@@ -69,7 +69,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAboutAuthor => 'Автор';
 
   @override
-  String get settingsAboutProjects => 'Source code';
+  String get settingsAboutSourceCode => 'Исходный код';
 
   @override
   String get settingsAboutTelegram => 'Телеграм';
@@ -82,6 +82,18 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unitMiles => 'Мили';
+
+  @override
+  String get unitKilometersShort => 'км';
+
+  @override
+  String get unitMilesShort => 'ми';
+
+  @override
+  String get unitMetersShort => 'м';
+
+  @override
+  String get unitHoursShort => 'ч';
 
   @override
   String get languageEnglish => 'Английский';
@@ -100,6 +112,51 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get themeDark => 'Темная';
+
+  @override
+  String get unitMinutesShort => 'мин';
+
+  @override
+  String get calculatorModeSprint => 'Спринт';
+
+  @override
+  String get calculatorModeLong => 'Стайерские';
+
+  @override
+  String get calculatorDistances => 'Дистанции';
+
+  @override
+  String get calculatorDistance => 'Дистанция';
+
+  @override
+  String get calculatorPace => 'Темп';
+
+  @override
+  String get calculatorSpeed => 'Скорость';
+
+  @override
+  String get calculatorTime => 'Время';
+
+  @override
+  String get calculatorTimeFormat => 'ч:мин:сек';
+
+  @override
+  String get calculatorCancel => 'Отмена';
+
+  @override
+  String get calculatorOk => 'Ок';
+
+  @override
+  String get calculatorSave => 'Сохранить';
+
+  @override
+  String get calculatorSavedCalculations => 'Сохраненные расчеты';
+
+  @override
+  String get calculatorNoSaved => 'Пока нет сохраненных расчетов';
+
+  @override
+  String get calculatorSprintMile => '1 миля';
 
   @override
   String get calculatorPlaceholder =>

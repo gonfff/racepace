@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:pacenote/application/calculator/calculator_service.dart';
 import 'package:pacenote/application/settings/settings_service.dart';
+import 'package:pacenote/infrastructure/calculator/calculator_repository_local.dart';
 import 'package:pacenote/infrastructure/database/app_database.dart';
 import 'package:pacenote/infrastructure/settings/settings_repository_local.dart';
 import 'package:pacenote/presentation/app/pacenote_app.dart';
@@ -11,16 +13,27 @@ Future<Widget> bootstrap() async {
   final repository = SettingsRepositoryLocal(database);
   final service = SettingsService(repository);
   final notifier = SettingsNotifier(service);
+  final calculatorRepository = CalculatorRepositoryLocal(database);
+  final calculatorService = CalculatorService(calculatorRepository);
   await notifier.load();
 
-  return _AppBootstrap(database: database, settingsNotifier: notifier);
+  return _AppBootstrap(
+    database: database,
+    settingsNotifier: notifier,
+    calculatorService: calculatorService,
+  );
 }
 
 class _AppBootstrap extends StatefulWidget {
-  const _AppBootstrap({required this.database, required this.settingsNotifier});
+  const _AppBootstrap({
+    required this.database,
+    required this.settingsNotifier,
+    required this.calculatorService,
+  });
 
   final AppDatabase database;
   final SettingsNotifier settingsNotifier;
+  final CalculatorService calculatorService;
 
   @override
   State<_AppBootstrap> createState() => _AppBootstrapState();
@@ -36,6 +49,9 @@ class _AppBootstrapState extends State<_AppBootstrap> {
 
   @override
   Widget build(BuildContext context) {
-    return PacenoteApp(settingsNotifier: widget.settingsNotifier);
+    return PacenoteApp(
+      settingsNotifier: widget.settingsNotifier,
+      calculatorService: widget.calculatorService,
+    );
   }
 }
