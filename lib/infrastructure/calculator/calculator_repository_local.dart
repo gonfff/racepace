@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:pacenote/application/calculator/calculator_repository.dart';
-import 'package:pacenote/domain/calculator/calculation.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
-import 'package:pacenote/infrastructure/database/app_database.dart' as db;
+import 'package:racepace/application/calculator/calculator_repository.dart';
+import 'package:racepace/domain/calculator/calculation.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/infrastructure/database/app_database.dart' as db;
 
 class CalculatorRepositoryLocal implements CalculatorRepository {
   CalculatorRepositoryLocal(this._database);

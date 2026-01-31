@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:pacenote/application/calculator/calculator_service.dart';
+import 'package:racepace/application/calculator/calculator_service.dart';
 
 class CalculatorScope extends InheritedWidget {
   const CalculatorScope({

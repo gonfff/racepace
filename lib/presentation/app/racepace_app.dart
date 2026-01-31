@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
-import 'package:pacenote/application/calculator/calculator_service.dart';
-import 'package:pacenote/presentation/app/app_root.dart';
-import 'package:pacenote/presentation/app/calculator_scope.dart';
-import 'package:pacenote/presentation/app/settings_scope.dart';
-import 'package:pacenote/presentation/features/settings/settings_notifier.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/application/calculator/calculator_service.dart';
+import 'package:racepace/presentation/app/app_root.dart';
+import 'package:racepace/presentation/app/calculator_scope.dart';
+import 'package:racepace/presentation/app/settings_scope.dart';
+import 'package:racepace/presentation/features/settings/settings_notifier.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
 
-class PacenoteApp extends StatelessWidget {
-  const PacenoteApp({
+class RacepaceApp extends StatelessWidget {
+  const RacepaceApp({
     required this.settingsNotifier,
     required this.calculatorService,
     super.key,
@@ -33,7 +33,7 @@ class PacenoteApp extends StatelessWidget {
             };
             return CupertinoApp(
               debugShowCheckedModeBanner: false,
-              title: 'Pacenote',
+              title: 'Racepace',
               onGenerateTitle: (context) =>
                   AppLocalizations.of(context).appTitle,
               localizationsDelegates: AppLocalizations.localizationsDelegates,

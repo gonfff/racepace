@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pacenote/presentation/core/design/app_theme.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
+import 'package:racepace/presentation/core/design/app_theme.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class AboutScreen extends StatefulWidget {
 class _AboutScreenState extends State<AboutScreen> {
   static const _authorName = 'Denis Dementev';
   static const _authorUrl = 'https://gonfff.com';
-  static const _projectsUrl = 'https://github.com/gonfff/pacenote';
+  static const _projectsUrl = 'https://github.com/gonfff/racepace';
   static const _telegramUrl = 'https://t.me/gonff';
 
   String? _version;

@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:pacenote/domain/calculator/calculation.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
-import 'package:pacenote/presentation/app/calculator_scope.dart';
-import 'package:pacenote/presentation/app/settings_scope.dart';
-import 'package:pacenote/presentation/core/design/app_theme.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
+import 'package:racepace/domain/calculator/calculation.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/presentation/app/calculator_scope.dart';
+import 'package:racepace/presentation/app/settings_scope.dart';
+import 'package:racepace/presentation/core/design/app_theme.dart';
+import 'package:racepace/presentation/features/calculator/splits_screen.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key, required this.onOpenSettings});
@@ -68,6 +69,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final sprintDistances = _sprintDistancesMeters;
     final longDistances = _longDistancesKm;
     final canSave = _calculateValues() != null;
+    final hasDistance = _parseDistance(_distanceController.text) != null;
+    final hasPace = _parseDuration(_paceController.text) != null;
+    final hasTime = _parseDuration(_timeController.text) != null;
+    final canViewSplits = hasDistance && hasPace && hasTime;
     final unitShortLabel = _unitShortLabel(localizations, unit);
     final paceUnitLabel = '${localizations.unitMinutesShort}/$unitShortLabel';
 
@@ -213,6 +218,72 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                minSize: 0,
+                onPressed: canViewSplits
+                    ? () {
+                        final distance = _parseDistance(
+                          _distanceController.text,
+                        );
+                        final pace = _parseDuration(_paceController.text);
+                        final time = _parseDuration(_timeController.text);
+                        if (distance == null || pace == null || time == null) {
+                          return;
+                        }
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                            builder: (context) => SplitsScreen(
+                              distance: distance,
+                              pace: pace,
+                              time: time,
+                              unit: unit,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardBackgroundColor(context),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: CupertinoColors.systemGrey4.resolveFrom(context),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(CupertinoIcons.table),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          localizations.calculatorViewSplits,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: canViewSplits
+                                ? CupertinoColors.label.resolveFrom(context)
+                                : CupertinoColors.systemGrey.resolveFrom(
+                                    context,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        CupertinoIcons.chevron_right,
+                        color: canViewSplits
+                            ? CupertinoColors.systemGrey.resolveFrom(context)
+                            : CupertinoColors.systemGrey3.resolveFrom(context),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -402,6 +473,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _CalcField field,
     Unit unit,
   ) async {
+    final localizations = AppLocalizations.of(context);
     final initialText = switch (field) {
       _CalcField.distance => _distanceController.text,
       _CalcField.pace => _paceController.text,
@@ -417,53 +489,416 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
     final isTimeField = field == _CalcField.time;
     final isPaceField = field == _CalcField.pace;
+    final isDistanceField = field == _CalcField.distance;
     final inputFormatters = <TextInputFormatter>[
       if (isTimeField || isPaceField)
         _TimeTextInputFormatter(allowHours: isTimeField)
       else
-        FilteringTextInputFormatter.digitsOnly,
+        _DistanceTextInputFormatter(),
     ];
     final placeholder = switch (field) {
-      _CalcField.distance => '0',
+      _CalcField.distance => '0.0',
       _CalcField.pace => '__:__',
       _CalcField.time => '__:__:__',
     };
+    final unitShortLabel = _unitShortLabel(localizations, unit);
+    final paceUnitLabel = '${localizations.unitMinutesShort}/$unitShortLabel';
+    final title = switch (field) {
+      _CalcField.distance => localizations.calculatorDistance,
+      _CalcField.pace => localizations.calculatorPace,
+      _CalcField.time => localizations.calculatorTime,
+    };
+    const inputFieldHeight = 44.0;
+    var distanceValue = _parseDistance(_distanceController.text) ?? 0;
+    var distanceWhole = distanceValue.floor();
+    var distanceTenths = ((distanceValue - distanceWhole) * 10).round();
+    final maxDistanceWhole = _maxDistance.floor();
+    if (distanceWhole > maxDistanceWhole) {
+      distanceWhole = maxDistanceWhole;
+      distanceTenths = 0;
+    }
+    if (distanceTenths < 0) distanceTenths = 0;
+    if (distanceTenths > 9) distanceTenths = 9;
+    final paceValue = _clampPace(
+      _parseDuration(_paceController.text) ?? Duration.zero,
+    );
+    var paceMinutes = paceValue.inMinutes;
+    var paceSeconds = paceValue.inSeconds.remainder(60);
+    final timeValue = _clampTime(
+      _parseDuration(_timeController.text) ?? Duration.zero,
+    );
+    var timeHours = timeValue.inHours;
+    var timeMinutes = timeValue.inMinutes.remainder(60);
+    var timeSeconds = timeValue.inSeconds.remainder(60);
+    final distanceWholeController = FixedExtentScrollController(
+      initialItem: distanceWhole,
+    );
+    final distanceTenthsController = FixedExtentScrollController(
+      initialItem: distanceTenths,
+    );
+    final paceMinutesController = FixedExtentScrollController(
+      initialItem: paceMinutes,
+    );
+    final paceSecondsController = FixedExtentScrollController(
+      initialItem: paceSeconds,
+    );
+    final timeHoursController = FixedExtentScrollController(
+      initialItem: timeHours,
+    );
+    final timeMinutesController = FixedExtentScrollController(
+      initialItem: timeMinutes,
+    );
+    final timeSecondsController = FixedExtentScrollController(
+      initialItem: timeSeconds,
+    );
 
-    final result = await showCupertinoDialog<String?>(
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: Text(switch (field) {
-            _CalcField.distance => AppLocalizations.of(
-              context,
-            ).calculatorDistance,
-            _CalcField.pace => AppLocalizations.of(context).calculatorPace,
-            _CalcField.time => AppLocalizations.of(context).calculatorTime,
-          }),
-          content: Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: CupertinoTextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              inputFormatters: inputFormatters,
-              placeholder: placeholder,
-              textAlign: TextAlign.center,
+    Duration? durationFromMaskedInput(String text, {required bool allowHours}) {
+      final digits = _digitsOnly(text);
+      if (digits.isEmpty) return null;
+      return _durationFromDigits(digits, allowHours: allowHours);
+    }
+
+    void syncWheelFromText(StateSetter setState) {
+      if (isDistanceField) {
+        final parsed = _parseDistance(controller.text) ?? 0;
+        var whole = parsed.floor();
+        var tenths = ((parsed - whole) * 10).round();
+        if (whole > maxDistanceWhole) {
+          whole = maxDistanceWhole;
+          tenths = 0;
+        }
+        if (tenths < 0) tenths = 0;
+        if (tenths > 9) tenths = 9;
+        setState(() {
+          distanceWhole = whole;
+          distanceTenths = tenths;
+        });
+        distanceWholeController.jumpToItem(whole);
+        distanceTenthsController.jumpToItem(tenths);
+      } else if (isPaceField) {
+        final parsed = _clampPace(
+          durationFromMaskedInput(controller.text, allowHours: false) ??
+              Duration.zero,
+        );
+        final minutes = parsed.inMinutes;
+        final seconds = parsed.inSeconds.remainder(60);
+        setState(() {
+          paceMinutes = minutes;
+          paceSeconds = seconds;
+        });
+        paceMinutesController.jumpToItem(minutes);
+        paceSecondsController.jumpToItem(seconds);
+      } else {
+        final parsed = _clampTime(
+          durationFromMaskedInput(controller.text, allowHours: true) ??
+              Duration.zero,
+        );
+        final hours = parsed.inHours;
+        final minutes = parsed.inMinutes.remainder(60);
+        final seconds = parsed.inSeconds.remainder(60);
+        setState(() {
+          timeHours = hours;
+          timeMinutes = minutes;
+          timeSeconds = seconds;
+        });
+        timeHoursController.jumpToItem(hours);
+        timeMinutesController.jumpToItem(minutes);
+        timeSecondsController.jumpToItem(seconds);
+      }
+    }
+
+    String wheelValue() {
+      if (isDistanceField) {
+        final value = distanceWhole + (distanceTenths / 10);
+        return _clampDistance(value).toStringAsFixed(1);
+      }
+      if (isPaceField) {
+        final duration = Duration(minutes: paceMinutes, seconds: paceSeconds);
+        return _formatDuration(_clampPace(duration));
+      }
+      final duration = Duration(
+        hours: timeHours,
+        minutes: timeMinutes,
+        seconds: timeSeconds,
+      );
+      return _formatDuration(_clampTime(duration));
+    }
+
+    Widget buildPickerColumn({
+      required FixedExtentScrollController scrollController,
+      required int itemCount,
+      required ValueChanged<int> onSelected,
+    }) {
+      return Expanded(
+        child: CupertinoPicker(
+          scrollController: scrollController,
+          itemExtent: 32,
+          onSelectedItemChanged: onSelected,
+          useMagnifier: true,
+          magnification: 1.1,
+          children: List.generate(
+            itemCount,
+            (index) => Center(child: Text('$index')),
+          ),
+        ),
+      );
+    }
+
+    Widget buildDistancePicker(StateSetter setState, VoidCallback syncText) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 140,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildPickerColumn(
+                  scrollController: distanceWholeController,
+                  itemCount: maxDistanceWhole + 1,
+                  onSelected: (value) => setState(() {
+                    distanceWhole = value;
+                    if (distanceWhole >= maxDistanceWhole) {
+                      distanceTenths = 0;
+                      distanceTenthsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Text('.', style: TextStyle(fontSize: 18)),
+                ),
+                buildPickerColumn(
+                  scrollController: distanceTenthsController,
+                  itemCount: 10,
+                  onSelected: (value) => setState(() {
+                    distanceTenths = value;
+                    if (distanceWhole >= maxDistanceWhole && value > 0) {
+                      distanceTenths = 0;
+                      distanceTenthsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+              ],
             ),
           ),
-          actions: [
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: Text(AppLocalizations.of(context).calculatorCancel),
+          const SizedBox(height: 6),
+          Text(
+            unitShortLabel,
+            style: const TextStyle(color: CupertinoColors.systemGrey),
+          ),
+        ],
+      );
+    }
+
+    Widget buildPacePicker(StateSetter setState, VoidCallback syncText) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 140,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildPickerColumn(
+                  scrollController: paceMinutesController,
+                  itemCount: _maxPace.inMinutes + 1,
+                  onSelected: (value) => setState(() {
+                    paceMinutes = value;
+                    if (paceMinutes >= _maxPace.inMinutes && paceSeconds > 0) {
+                      paceSeconds = 0;
+                      paceSecondsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Text(':', style: TextStyle(fontSize: 18)),
+                ),
+                buildPickerColumn(
+                  scrollController: paceSecondsController,
+                  itemCount: 60,
+                  onSelected: (value) => setState(() {
+                    paceSeconds = value;
+                    if (paceMinutes >= _maxPace.inMinutes && value > 0) {
+                      paceSeconds = 0;
+                      paceSecondsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+              ],
             ),
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () => Navigator.of(context).pop(controller.text),
-              child: Text(AppLocalizations.of(context).calculatorOk),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            paceUnitLabel,
+            style: const TextStyle(color: CupertinoColors.systemGrey),
+          ),
+        ],
+      );
+    }
+
+    Widget buildTimePicker(StateSetter setState, VoidCallback syncText) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 140,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildPickerColumn(
+                  scrollController: timeHoursController,
+                  itemCount: _maxTime.inHours + 1,
+                  onSelected: (value) => setState(() {
+                    timeHours = value;
+                    if (timeHours >= _maxTime.inHours &&
+                        (timeMinutes > 0 || timeSeconds > 0)) {
+                      timeMinutes = 0;
+                      timeSeconds = 0;
+                      timeMinutesController.jumpToItem(0);
+                      timeSecondsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Text(':', style: TextStyle(fontSize: 18)),
+                ),
+                buildPickerColumn(
+                  scrollController: timeMinutesController,
+                  itemCount: 60,
+                  onSelected: (value) => setState(() {
+                    timeMinutes = value;
+                    if (timeHours >= _maxTime.inHours &&
+                        (value > 0 || timeSeconds > 0)) {
+                      timeMinutes = 0;
+                      timeSeconds = 0;
+                      timeMinutesController.jumpToItem(0);
+                      timeSecondsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  child: Text(':', style: TextStyle(fontSize: 18)),
+                ),
+                buildPickerColumn(
+                  scrollController: timeSecondsController,
+                  itemCount: 60,
+                  onSelected: (value) => setState(() {
+                    timeSeconds = value;
+                    if (timeHours >= _maxTime.inHours &&
+                        (timeMinutes > 0 || value > 0)) {
+                      timeMinutes = 0;
+                      timeSeconds = 0;
+                      timeMinutesController.jumpToItem(0);
+                      timeSecondsController.jumpToItem(0);
+                    }
+                    syncText();
+                  }),
+                ),
+              ],
             ),
-          ],
-        );
-      },
-    );
+          ),
+          const SizedBox(height: 6),
+          Text(
+            localizations.calculatorTimeFormat,
+            style: const TextStyle(color: CupertinoColors.systemGrey),
+          ),
+        ],
+      );
+    }
+
+    String? result;
+    var isSyncing = false;
+    try {
+      result = await showCupertinoDialog<String?>(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              void syncTextFromWheel() {
+                if (isSyncing) return;
+                isSyncing = true;
+                final text = wheelValue();
+                controller.value = controller.value.copyWith(
+                  text: text,
+                  selection: TextSelection.collapsed(offset: text.length),
+                );
+                isSyncing = false;
+              }
+
+              void syncWheelFromField() {
+                if (isSyncing) return;
+                isSyncing = true;
+                syncWheelFromText(setState);
+                isSyncing = false;
+              }
+
+              final inputField = CupertinoTextField(
+                controller: controller,
+                keyboardType: isDistanceField
+                    ? const TextInputType.numberWithOptions(decimal: true)
+                    : TextInputType.number,
+                inputFormatters: inputFormatters,
+                placeholder: placeholder,
+                textAlign: TextAlign.center,
+                onChanged: (_) => syncWheelFromField(),
+              );
+              final picker = switch (field) {
+                _CalcField.distance => buildDistancePicker(
+                  setState,
+                  syncTextFromWheel,
+                ),
+                _CalcField.pace => buildPacePicker(setState, syncTextFromWheel),
+                _CalcField.time => buildTimePicker(setState, syncTextFromWheel),
+              };
+
+              return CupertinoAlertDialog(
+                title: Text(title),
+                content: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: inputFieldHeight, child: inputField),
+                      const SizedBox(height: 12),
+                      picker,
+                    ],
+                  ),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    onPressed: () => Navigator.of(context).pop(null),
+                    child: Text(localizations.calculatorCancel),
+                  ),
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(context).pop(controller.text),
+                    child: Text(localizations.calculatorOk),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    } finally {
+      distanceWholeController.dispose();
+      distanceTenthsController.dispose();
+      paceMinutesController.dispose();
+      paceSecondsController.dispose();
+      timeHoursController.dispose();
+      timeMinutesController.dispose();
+      timeSecondsController.dispose();
+    }
 
     if (result == null) return;
     final trimmed = result.trim();
@@ -841,6 +1276,47 @@ class _TimeTextInputFormatter extends TextInputFormatter {
     }
     if (base <= 2) return base;
     return base + 1;
+  }
+}
+
+class _DistanceTextInputFormatter extends TextInputFormatter {
+  static const int _maxIntegerDigits = 3;
+  static const int _maxFractionDigits = 1;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var text = newValue.text.replaceAll(',', '.');
+    text = text.replaceAll(RegExp(r'[^0-9.]'), '');
+    final firstDot = text.indexOf('.');
+    if (firstDot != -1) {
+      final beforeDot = text.substring(0, firstDot);
+      final afterDot = text.substring(firstDot + 1).replaceAll('.', '');
+      text = '$beforeDot.$afterDot';
+    }
+
+    final dotIndex = text.indexOf('.');
+    if (dotIndex != -1) {
+      var intPart = text.substring(0, dotIndex);
+      var fracPart = text.substring(dotIndex + 1);
+      if (intPart.isEmpty) intPart = '0';
+      if (intPart.length > _maxIntegerDigits) {
+        intPart = intPart.substring(0, _maxIntegerDigits);
+      }
+      if (fracPart.length > _maxFractionDigits) {
+        fracPart = fracPart.substring(0, _maxFractionDigits);
+      }
+      text = fracPart.isEmpty ? '$intPart.' : '$intPart.$fracPart';
+    } else if (text.length > _maxIntegerDigits) {
+      text = text.substring(0, _maxIntegerDigits);
+    }
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 }
 

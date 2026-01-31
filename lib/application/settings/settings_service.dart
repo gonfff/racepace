@@ -1,5 +1,5 @@
-import 'package:pacenote/application/settings/settings_repository.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
+import 'package:racepace/application/settings/settings_repository.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
 
 class SettingsService {
   SettingsService(this._repository);

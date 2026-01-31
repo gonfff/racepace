@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Pacenote'**
+  /// **'Racepace'**
   String get appTitle;
 
   /// No description provided for @tabCalculator.
@@ -361,6 +361,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'h:mm:ss'**
   String get calculatorTimeFormat;
+
+  /// No description provided for @calculatorInputWheel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wheel'**
+  String get calculatorInputWheel;
+
+  /// No description provided for @calculatorInputKeyboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard'**
+  String get calculatorInputKeyboard;
+
+  /// No description provided for @calculatorViewSplits.
+  ///
+  /// In en, this message translates to:
+  /// **'View splits'**
+  String get calculatorViewSplits;
+
+  /// No description provided for @splitsSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Split settings'**
+  String get splitsSettingsTitle;
+
+  /// No description provided for @splitsIntervalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Split interval'**
+  String get splitsIntervalTitle;
+
+  /// No description provided for @splitsPaceStrategyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace strategy'**
+  String get splitsPaceStrategyTitle;
+
+  /// No description provided for @splitsStartTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get splitsStartTimeTitle;
+
+  /// No description provided for @splitsStrategyNegative10.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative 10%'**
+  String get splitsStrategyNegative10;
+
+  /// No description provided for @splitsStrategyNegative5.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative 5%'**
+  String get splitsStrategyNegative5;
+
+  /// No description provided for @splitsStrategySteady.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady'**
+  String get splitsStrategySteady;
+
+  /// No description provided for @splitsStrategyPositive5.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive 5%'**
+  String get splitsStrategyPositive5;
+
+  /// No description provided for @splitsStrategyPositive10.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive 10%'**
+  String get splitsStrategyPositive10;
+
+  /// No description provided for @splitsStrategyNegative10Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 5% slower, finish 5% faster.'**
+  String get splitsStrategyNegative10Description;
+
+  /// No description provided for @splitsStrategyNegative5Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 2.5% slower, finish 2.5% faster.'**
+  String get splitsStrategyNegative5Description;
+
+  /// No description provided for @splitsStrategySteadyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Even pace throughout.'**
+  String get splitsStrategySteadyDescription;
+
+  /// No description provided for @splitsStrategyPositive5Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 2.5% faster, finish 2.5% slower.'**
+  String get splitsStrategyPositive5Description;
+
+  /// No description provided for @splitsStrategyPositive10Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Start 5% faster, finish 5% slower.'**
+  String get splitsStrategyPositive10Description;
+
+  /// No description provided for @splitsStrategyNegativeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative {percent}%'**
+  String splitsStrategyNegativeLabel(Object percent);
+
+  /// No description provided for @splitsStrategyPositiveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive {percent}%'**
+  String splitsStrategyPositiveLabel(Object percent);
+
+  /// No description provided for @splitsStrategyNegativeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative split. Start {percent}% slower, finish {percent}% faster.'**
+  String splitsStrategyNegativeDescription(Object percent);
+
+  /// No description provided for @splitsStrategyPositiveDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive split. Start {percent}% faster, finish {percent}% slower.'**
+  String splitsStrategyPositiveDescription(Object percent);
+
+  /// No description provided for @splitsColumnIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'#'**
+  String get splitsColumnIndex;
+
+  /// No description provided for @splitsColumnDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get splitsColumnDistance;
+
+  /// No description provided for @splitsColumnPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace'**
+  String get splitsColumnPace;
+
+  /// No description provided for @splitsColumnFromZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Gun time'**
+  String get splitsColumnFromZero;
+
+  /// No description provided for @splitsColumnFromStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Chip time'**
+  String get splitsColumnFromStart;
 
   /// No description provided for @calculatorCancel.
   ///

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pacenote/presentation/core/design/app_theme.dart';
+import 'package:racepace/presentation/core/design/app_theme.dart';
 
 class PlaceholderCard extends StatelessWidget {
   const PlaceholderCard({super.key, required this.child});

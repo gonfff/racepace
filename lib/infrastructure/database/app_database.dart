@@ -58,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File(path.join(directory.path, 'pacenote.sqlite'));
+    final file = File(path.join(directory.path, 'racepace.sqlite'));
     return NativeDatabase(file);
   });
 }

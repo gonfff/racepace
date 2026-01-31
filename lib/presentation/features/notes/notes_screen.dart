@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
-import 'package:pacenote/presentation/core/design/app_theme.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
+import 'package:racepace/presentation/core/design/app_theme.dart';
 
 class NotesScreen extends StatelessWidget {
   const NotesScreen({super.key, required this.onOpenSettings});

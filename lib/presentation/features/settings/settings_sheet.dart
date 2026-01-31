@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
-import 'package:pacenote/presentation/app/settings_scope.dart';
-import 'package:pacenote/presentation/core/design/app_theme.dart';
-import 'package:pacenote/presentation/features/settings/about_screen.dart';
-import 'package:pacenote/presentation/features/settings/support_screen.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/presentation/app/settings_scope.dart';
+import 'package:racepace/presentation/core/design/app_theme.dart';
+import 'package:racepace/presentation/features/settings/about_screen.dart';
+import 'package:racepace/presentation/features/settings/support_screen.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
 
 class SettingsSheet extends StatelessWidget {
   const SettingsSheet({super.key});

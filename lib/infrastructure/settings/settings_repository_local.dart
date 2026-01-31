@@ -1,6 +1,6 @@
-import 'package:pacenote/application/settings/settings_repository.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
-import 'package:pacenote/infrastructure/database/app_database.dart';
+import 'package:racepace/application/settings/settings_repository.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/infrastructure/database/app_database.dart';
 
 class _SettingsStorageKeys {
   static const String unit = 'unit';

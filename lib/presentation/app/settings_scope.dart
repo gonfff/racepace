@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:pacenote/presentation/features/settings/settings_notifier.dart';
+import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 
 class SettingsScope extends InheritedNotifier<SettingsNotifier> {
   const SettingsScope({

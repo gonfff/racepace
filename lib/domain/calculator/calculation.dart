@@ -1,4 +1,4 @@
-import 'package:pacenote/domain/settings/app_settings.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
 
 class Calculation {
   const Calculation({

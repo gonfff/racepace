@@ -1,5 +1,5 @@
-import 'package:pacenote/application/calculator/calculator_repository.dart';
-import 'package:pacenote/domain/calculator/calculation.dart';
+import 'package:racepace/application/calculator/calculator_repository.dart';
+import 'package:racepace/domain/calculator/calculation.dart';
 
 class CalculatorService {
   CalculatorService(this._repository);

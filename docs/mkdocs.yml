@@ -1,0 +1,27 @@
+site_name: Racepace Docs
+site_description: "Docs for publishing Racepace on App Store"
+site_url: https://gonfff.github.io/racepace
+repo_url: https://github.com/gonfff/racepace
+repo_name: racepace
+docs_dir: pages
+site_dir: site
+nav:
+  - Home: index.md
+  - Policy:
+      - Privacy Policy (EN): policy-en.md
+      - Политика конфиденциальности (RU): policy-ru.md
+  - Support:
+      - Support Racepace (EN): support-en.md
+      - Поддержка Racepace (RU): support-ru.md
+
+theme:
+  name: material
+  language: en
+  favicon: assets/favicon-32x32.png
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.top
+markdown_extensions:
+  - toc:
+      permalink: true
