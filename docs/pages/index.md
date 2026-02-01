@@ -1,8 +1,8 @@
 # Racepace Docs
 
 Ultimate Running Pace Calculator, built with Flutter/Cupertino widgets.
-Racepace keeps tabs on recurring costs, converts currencies automatically, and
-sends optional local reminders before renewals hit.
+Racepace helps runners and cyclists calculate pace, speed, and finish times
+for their workouts and races.
 
 - [Privacy Policy (English)](policy-en.md)
 - [Политика конфиденциальности (Russian)](policy-ru.md)
