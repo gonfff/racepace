@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:racepace/domain/settings/app_settings.dart';
 import 'package:racepace/presentation/core/design/app_theme.dart';
 import 'package:racepace/presentation/l10n/app_localizations.dart';
+import 'package:share_plus/share_plus.dart';
 
 part 'splits_screen_dialogs.dart';
 part 'splits_screen_widgets.dart';
@@ -17,12 +18,15 @@ class SplitsScreen extends StatefulWidget {
     required this.pace,
     required this.time,
     required this.unit,
+    this.onValuesChanged,
   });
 
   final double distance;
   final Duration pace;
   final Duration time;
   final Unit unit;
+  final void Function(double distance, Duration pace, Duration time)?
+  onValuesChanged;
 
   @override
   State<SplitsScreen> createState() => _SplitsScreenState();
@@ -79,6 +83,10 @@ class _SplitsScreenState extends State<SplitsScreen> {
     setState(update);
   }
 
+  void _emitValuesChanged() {
+    widget.onValuesChanged?.call(_distance, _pace, _time);
+  }
+
   String _formattedStartTime() {
     final parsed = _parseClock(_startTimeController.text);
     if (parsed == null) return _defaultStartTime;
@@ -104,10 +112,43 @@ class _SplitsScreenState extends State<SplitsScreen> {
       startTime: startTime,
     );
 
+    final canShare = splits.isNotEmpty;
+
     return CupertinoPageScaffold(
       backgroundColor: AppTheme.scaffoldBackgroundColor(context),
       navigationBar: CupertinoNavigationBar(
         middle: Text(localizations.calculatorViewSplits),
+        trailing: Builder(
+          builder: (context) {
+            return CupertinoButton(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              onPressed: canShare
+                  ? () {
+                      final box = context.findRenderObject() as RenderBox?;
+                      final origin = box == null
+                          ? Rect.zero
+                          : box.localToGlobal(Offset.zero) & box.size;
+                      Share.share(
+                        _buildShareText(
+                          localizations,
+                          unitShortLabel,
+                          paceUnitLabel,
+                          splits,
+                        ),
+                        sharePositionOrigin: origin,
+                      );
+                    }
+                  : null,
+              child: Icon(
+                CupertinoIcons.share,
+                color: canShare
+                    ? CupertinoColors.activeBlue
+                    : CupertinoColors.systemGrey,
+              ),
+            );
+          },
+        ),
       ),
       child: SafeArea(
         child: Column(

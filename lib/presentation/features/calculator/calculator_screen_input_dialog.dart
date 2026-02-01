@@ -355,91 +355,99 @@ extension _CalculatorInputDialog on _CalculatorScreenState {
 
     String? result;
     var isSyncing = false;
-    try {
-      result = await showCupertinoDialog<String?>(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              void syncTextFromWheel() {
-                if (isSyncing) return;
-                isSyncing = true;
-                final text = wheelValue();
-                controller.value = controller.value.copyWith(
-                  text: text,
-                  selection: TextSelection.collapsed(offset: text.length),
-                );
-                isSyncing = false;
-              }
-
-              void syncWheelFromField() {
-                if (isSyncing) return;
-                isSyncing = true;
-                syncWheelFromText(setState);
-                isSyncing = false;
-              }
-
-              final inputField = CupertinoTextField(
-                controller: controller,
-                keyboardType: isDistanceField
-                    ? const TextInputType.numberWithOptions(decimal: true)
-                    : TextInputType.number,
-                inputFormatters: inputFormatters,
-                placeholder: placeholder,
-                textAlign: TextAlign.center,
-                onChanged: (_) => syncWheelFromField(),
+    result = await showCupertinoDialog<String?>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void syncTextFromWheel() {
+              if (isSyncing) return;
+              isSyncing = true;
+              final text = wheelValue();
+              controller.value = controller.value.copyWith(
+                text: text,
+                selection: TextSelection.collapsed(offset: text.length),
               );
-              final picker = switch (field) {
-                _CalcField.distance => buildDistancePicker(
-                  setState,
-                  syncTextFromWheel,
-                ),
-                _CalcField.pace => buildPacePicker(setState, syncTextFromWheel),
-                _CalcField.time => buildTimePicker(setState, syncTextFromWheel),
-              };
+              isSyncing = false;
+            }
 
-              return CupertinoAlertDialog(
-                title: Text(title),
-                content: Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: inputFieldHeight, child: inputField),
-                      const SizedBox(height: 12),
-                      picker,
-                    ],
-                  ),
+            void syncWheelFromField() {
+              if (isSyncing) return;
+              isSyncing = true;
+              syncWheelFromText(setState);
+              isSyncing = false;
+            }
+
+            final inputField = CupertinoTextField(
+              controller: controller,
+              keyboardType: isDistanceField
+                  ? const TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.number,
+              inputFormatters: inputFormatters,
+              placeholder: placeholder,
+              textAlign: TextAlign.center,
+              onChanged: (_) => syncWheelFromField(),
+            );
+            final picker = switch (field) {
+              _CalcField.distance => buildDistancePicker(
+                setState,
+                syncTextFromWheel,
+              ),
+              _CalcField.pace => buildPacePicker(setState, syncTextFromWheel),
+              _CalcField.time => buildTimePicker(setState, syncTextFromWheel),
+            };
+
+            return CupertinoAlertDialog(
+              title: Text(title),
+              content: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: inputFieldHeight, child: inputField),
+                    const SizedBox(height: 12),
+                    picker,
+                  ],
                 ),
-                actions: [
-                  CupertinoDialogAction(
-                    onPressed: () => Navigator.of(context).pop(null),
-                    child: Text(localizations.calculatorCancel),
-                  ),
-                  CupertinoDialogAction(
-                    isDefaultAction: true,
-                    onPressed: () => Navigator.of(context).pop(controller.text),
-                    child: Text(localizations.calculatorOk),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-    } finally {
-      distanceWholeController.dispose();
-      distanceTenthsController.dispose();
-      paceMinutesController.dispose();
-      paceSecondsController.dispose();
-      timeHoursController.dispose();
-      timeMinutesController.dispose();
-      timeSecondsController.dispose();
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () => Navigator.of(context).pop(null),
+                  child: Text(localizations.calculatorCancel),
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: () => Navigator.of(context).pop(controller.text),
+                  child: Text(localizations.calculatorOk),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    void disposeControllers() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        distanceWholeController.dispose();
+        distanceTenthsController.dispose();
+        paceMinutesController.dispose();
+        paceSecondsController.dispose();
+        timeHoursController.dispose();
+        timeMinutesController.dispose();
+        timeSecondsController.dispose();
+      });
     }
 
-    if (result == null) return;
+    if (result == null) {
+      disposeControllers();
+      return;
+    }
     final trimmed = result.trim();
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty) {
+      disposeControllers();
+      return;
+    }
 
     switch (field) {
       case _CalcField.distance:
@@ -465,5 +473,6 @@ extension _CalculatorInputDialog on _CalculatorScreenState {
     }
 
     _handleChange(field);
+    disposeControllers();
   }
 }

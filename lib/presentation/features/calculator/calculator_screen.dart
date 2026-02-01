@@ -251,6 +251,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                               pace: pace,
                               time: time,
                               unit: unit,
+                              onValuesChanged: (newDistance, newPace, newTime) {
+                                _isUpdating = true;
+                                _distanceController.text = _formatNumber(
+                                  newDistance,
+                                );
+                                _paceController.text = _formatDuration(newPace);
+                                _timeController.text = _formatDuration(newTime);
+                                _isUpdating = false;
+                                setState(() {});
+                              },
                             ),
                           ),
                         );

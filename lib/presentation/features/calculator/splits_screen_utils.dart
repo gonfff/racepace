@@ -141,6 +141,28 @@ String _formatPercent(double value) {
   return value.toStringAsFixed(1).replaceFirst(RegExp(r'0$'), '');
 }
 
+String _buildShareText(
+  AppLocalizations localizations,
+  String unitShortLabel,
+  String paceUnitLabel,
+  List<_SplitRow> splits,
+) {
+  final buffer = StringBuffer();
+  buffer.writeln(
+    '${localizations.splitsColumnDistance} ($unitShortLabel)\t'
+    '${localizations.splitsColumnPace} ($paceUnitLabel)\t'
+    '${localizations.splitsColumnFromStart}',
+  );
+  for (final row in splits) {
+    buffer.writeln(
+      '${_formatNumber(row.distance)}\t'
+      '${_formatDuration(row.pace)}\t'
+      '${_formatDuration(row.elapsed)}',
+    );
+  }
+  return buffer.toString().trimRight();
+}
+
 String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
 String _unitShortLabel(AppLocalizations localizations, Unit unit) {
