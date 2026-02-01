@@ -4,9 +4,9 @@ import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 class SettingsScope extends InheritedNotifier<SettingsNotifier> {
   const SettingsScope({
     required SettingsNotifier controller,
-    required Widget child,
+    required super.child,
     super.key,
-  }) : super(notifier: controller, child: child);
+  }) : super(notifier: controller);
 
   static SettingsNotifier of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<SettingsScope>();

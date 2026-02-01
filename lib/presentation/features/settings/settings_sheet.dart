@@ -32,8 +32,6 @@ class _SettingsSheetContentState extends State<_SettingsSheetContent> {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        final settings = controller.settings;
-        final localizations = AppLocalizations.of(context);
         final mediaPadding = MediaQuery.paddingOf(context);
 
         final home = _SettingsHome(
@@ -63,7 +61,7 @@ class _SettingsSheetContentState extends State<_SettingsSheetContent> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: CupertinoColors.black.withOpacity(0.12),
+                      color: CupertinoColors.black.withValues(alpha: 0.12),
                       blurRadius: 24,
                       offset: const Offset(0, -6),
                     ),

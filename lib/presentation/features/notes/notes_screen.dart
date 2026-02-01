@@ -17,7 +17,7 @@ class NotesScreen extends StatelessWidget {
         middle: Text(localizations.screenNotes),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          minSize: 0,
+          minimumSize: Size.zero,
           onPressed: onOpenSettings,
           child: const Icon(CupertinoIcons.gear_alt_fill),
         ),
