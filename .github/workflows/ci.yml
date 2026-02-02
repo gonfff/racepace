@@ -1,0 +1,80 @@
+name: Flutter Tests
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "backend/**"
+  pull_request:
+    paths-ignore:
+      - "backend/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter (with cache)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.5"
+          channel: stable
+          cache: true
+
+      - name: Cache apt packages
+        id: cache-apt
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt/archives
+            /var/lib/apt/lists
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/**') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Install coverage tooling (cached)
+        if: steps.cache-apt.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lcov bc
+
+      - name: Ensure coverage tooling present
+        run: |
+          command -v lcov >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y lcov)
+          command -v bc   >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y bc)
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Enforce coverage threshold
+        run: |
+          threshold=70
+          summary=$(lcov --summary coverage/lcov.info)
+          echo "$summary"
+          coverage=$(echo "$summary" | awk '/lines\.+:/ {gsub("%","",$2); print $2; exit}')
+          if [ -z "$coverage" ]; then
+            echo "Unable to parse coverage percentage from lcov summary."
+            exit 1
+          fi
+          echo "Total coverage: ${coverage}% (required: >= ${threshold}%)"
+          if (( $(echo "$coverage < $threshold" | bc -l) )); then
+            echo "Coverage check failed: ${coverage}% is below ${threshold}%."
+            exit 1
+          fi
+          echo "Coverage check passed."

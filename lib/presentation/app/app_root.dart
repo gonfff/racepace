@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pacenote/presentation/features/calculator/calculator_screen.dart';
-import 'package:pacenote/presentation/features/notes/notes_screen.dart';
-import 'package:pacenote/presentation/features/settings/settings_sheet.dart';
-import 'package:pacenote/presentation/l10n/app_localizations.dart';
+import 'package:racepace/presentation/features/calculator/calculator_screen.dart';
+import 'package:racepace/presentation/features/notes/notes_screen.dart';
+import 'package:racepace/presentation/features/settings/settings_sheet.dart';
+import 'package:racepace/presentation/l10n/app_localizations.dart';
 
 class AppRoot extends StatelessWidget {
   const AppRoot({super.key});

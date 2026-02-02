@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Pacenote';
+  String get appTitle => 'Racepace';
 
   @override
   String get tabCalculator => 'Calculator';
@@ -139,6 +139,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calculatorTimeFormat => 'h:mm:ss';
+
+  @override
+  String get calculatorInputWheel => 'Wheel';
+
+  @override
+  String get calculatorInputKeyboard => 'Keyboard';
+
+  @override
+  String get calculatorViewSplits => 'View splits';
+
+  @override
+  String get splitsSettingsTitle => 'Split settings';
+
+  @override
+  String get splitsIntervalTitle => 'Split interval';
+
+  @override
+  String get splitsPaceStrategyTitle => 'Pace strategy';
+
+  @override
+  String get splitsStartTimeTitle => 'Start time';
+
+  @override
+  String get splitsStrategyNegative10 => 'Negative 10%';
+
+  @override
+  String get splitsStrategyNegative5 => 'Negative 5%';
+
+  @override
+  String get splitsStrategySteady => 'Steady';
+
+  @override
+  String get splitsStrategyPositive5 => 'Positive 5%';
+
+  @override
+  String get splitsStrategyPositive10 => 'Positive 10%';
+
+  @override
+  String get splitsStrategyNegative10Description =>
+      'Start 5% slower, finish 5% faster.';
+
+  @override
+  String get splitsStrategyNegative5Description =>
+      'Start 2.5% slower, finish 2.5% faster.';
+
+  @override
+  String get splitsStrategySteadyDescription => 'Even pace throughout.';
+
+  @override
+  String get splitsStrategyPositive5Description =>
+      'Start 2.5% faster, finish 2.5% slower.';
+
+  @override
+  String get splitsStrategyPositive10Description =>
+      'Start 5% faster, finish 5% slower.';
+
+  @override
+  String splitsStrategyNegativeLabel(Object percent) {
+    return 'Negative $percent%';
+  }
+
+  @override
+  String splitsStrategyPositiveLabel(Object percent) {
+    return 'Positive $percent%';
+  }
+
+  @override
+  String splitsStrategyNegativeDescription(Object percent) {
+    return 'Negative split. Start $percent% slower, finish $percent% faster.';
+  }
+
+  @override
+  String splitsStrategyPositiveDescription(Object percent) {
+    return 'Positive split. Start $percent% faster, finish $percent% slower.';
+  }
+
+  @override
+  String get splitsColumnIndex => '#';
+
+  @override
+  String get splitsColumnDistance => 'Distance';
+
+  @override
+  String get splitsColumnPace => 'Pace';
+
+  @override
+  String get splitsColumnFromZero => 'Gun time';
+
+  @override
+  String get splitsColumnFromStart => 'Chip time';
 
   @override
   String get calculatorCancel => 'Cancel';

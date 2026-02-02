@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:pacenote/application/calculator/calculator_service.dart';
-import 'package:pacenote/application/settings/settings_service.dart';
-import 'package:pacenote/infrastructure/calculator/calculator_repository_local.dart';
-import 'package:pacenote/infrastructure/database/app_database.dart';
-import 'package:pacenote/infrastructure/settings/settings_repository_local.dart';
-import 'package:pacenote/presentation/app/pacenote_app.dart';
-import 'package:pacenote/presentation/features/settings/settings_notifier.dart';
+import 'package:racepace/application/calculator/calculator_service.dart';
+import 'package:racepace/application/settings/settings_service.dart';
+import 'package:racepace/infrastructure/calculator/calculator_repository_local.dart';
+import 'package:racepace/infrastructure/database/app_database.dart';
+import 'package:racepace/infrastructure/settings/settings_repository_local.dart';
+import 'package:racepace/presentation/app/racepace_app.dart';
+import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 
 Future<Widget> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +49,7 @@ class _AppBootstrapState extends State<_AppBootstrap> {
 
   @override
   Widget build(BuildContext context) {
-    return PacenoteApp(
+    return RacepaceApp(
       settingsNotifier: widget.settingsNotifier,
       calculatorService: widget.calculatorService,
     );

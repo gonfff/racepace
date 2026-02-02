@@ -12,7 +12,7 @@ class AppSettings {
   });
 
   static const Unit defaultUnit = Unit.kilometers;
-  static const AppLanguage defaultLanguage = AppLanguage.english;
+  static const AppLanguage defaultLanguage = AppLanguage.system;
   static const AppThemeMode defaultTheme = AppThemeMode.system;
 
   final Unit unit;

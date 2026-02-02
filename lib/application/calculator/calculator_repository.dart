@@ -1,4 +1,4 @@
-import 'package:pacenote/domain/calculator/calculation.dart';
+import 'package:racepace/domain/calculator/calculation.dart';
 
 abstract class CalculatorRepository {
   Future<List<Calculation>> loadCalculations();

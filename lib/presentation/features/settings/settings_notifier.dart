@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:pacenote/application/settings/settings_service.dart';
-import 'package:pacenote/domain/settings/app_settings.dart';
+import 'package:racepace/application/settings/settings_service.dart';
+import 'package:racepace/domain/settings/app_settings.dart';
 
 class SettingsNotifier extends ChangeNotifier {
   SettingsNotifier(this._service);
