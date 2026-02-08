@@ -37,24 +37,27 @@ Widget buildTestApp({
   CalculatorService? calculatorService,
   SplitsPresetsService? splitsPresetsService,
 }) {
-  Widget wrapped = child;
-  if (calculatorService != null) {
-    wrapped = CalculatorScope(service: calculatorService, child: wrapped);
-  }
-  if (settingsNotifier != null) {
-    wrapped = SettingsScope(controller: settingsNotifier, child: wrapped);
-  }
-  wrapped = SplitsPresetsScope(
-    service: splitsPresetsService ?? createTestSplitsPresetsService(),
-    child: wrapped,
-  );
-
-  return CupertinoApp(
+  Widget app = CupertinoApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
-    home: wrapped,
+    home: child,
   );
+
+  app = SplitsPresetsScope(
+    service: splitsPresetsService ?? createTestSplitsPresetsService(),
+    child: app,
+  );
+
+  if (settingsNotifier != null) {
+    app = SettingsScope(controller: settingsNotifier, child: app);
+  }
+
+  if (calculatorService != null) {
+    app = CalculatorScope(service: calculatorService, child: app);
+  }
+
+  return app;
 }
 
 class FakeSettingsRepository implements SettingsRepository {
