@@ -33,6 +33,30 @@ class CalculatorRepositoryLocal implements CalculatorRepository {
 
   @override
   Future<Calculation> addCalculation(CalculationDraft draft) async {
+    final existing =
+        await (_database.select(_database.calculations)..where(
+              (table) =>
+                  table.distance.equals(draft.distance) &
+                  table.paceSeconds.equals(draft.pace.inSeconds) &
+                  table.timeSeconds.equals(draft.time.inSeconds) &
+                  table.unit.equals(draft.unit.code),
+            ))
+            .getSingleOrNull();
+    final createdAt = draft.createdAt.millisecondsSinceEpoch;
+    if (existing != null) {
+      await (_database.update(_database.calculations)
+            ..where((table) => table.id.equals(existing.id)))
+          .write(db.CalculationsCompanion(createdAt: Value(createdAt)));
+      return Calculation(
+        id: existing.id,
+        distance: existing.distance,
+        pace: Duration(seconds: existing.paceSeconds),
+        time: Duration(seconds: existing.timeSeconds),
+        unit: UnitStorage.fromCode(existing.unit),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(createdAt),
+      );
+    }
+
     final id = await _database
         .into(_database.calculations)
         .insert(
@@ -41,7 +65,7 @@ class CalculatorRepositoryLocal implements CalculatorRepository {
             paceSeconds: draft.pace.inSeconds,
             timeSeconds: draft.time.inSeconds,
             unit: draft.unit.code,
-            createdAt: draft.createdAt.millisecondsSinceEpoch,
+            createdAt: createdAt,
           ),
         );
     return Calculation(

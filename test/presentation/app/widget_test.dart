@@ -10,10 +10,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:racepace/application/calculator/calculator_repository.dart';
 import 'package:racepace/application/calculator/calculator_service.dart';
+import 'package:racepace/application/splits/splits_presets_repository.dart';
+import 'package:racepace/application/splits/splits_presets_service.dart';
 import 'package:racepace/application/settings/settings_repository.dart';
 import 'package:racepace/application/settings/settings_service.dart';
 import 'package:racepace/domain/calculator/calculation.dart';
 import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/domain/splits/splits_preset.dart';
 import 'package:racepace/presentation/app/racepace_app.dart';
 import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 
@@ -24,11 +27,15 @@ void main() {
     final notifier = SettingsNotifier(service);
     await notifier.load();
     final calculatorService = CalculatorService(_FakeCalculatorRepository());
+    final splitsPresetsService = SplitsPresetsService(
+      _FakeSplitsPresetsRepository(),
+    );
 
     await tester.pumpWidget(
       RacepaceApp(
         settingsNotifier: notifier,
         calculatorService: calculatorService,
+        splitsPresetsService: splitsPresetsService,
       ),
     );
 
@@ -74,4 +81,15 @@ class _FakeCalculatorRepository implements CalculatorRepository {
 
   @override
   Future<void> deleteCalculation(int id) async {}
+}
+
+class _FakeSplitsPresetsRepository implements SplitsPresetsRepository {
+  @override
+  Future<void> deletePreset(int id) async {}
+
+  @override
+  Future<List<SplitsPreset>> loadPresets() async => [];
+
+  @override
+  Future<void> savePreset(SplitsPreset preset) async {}
 }

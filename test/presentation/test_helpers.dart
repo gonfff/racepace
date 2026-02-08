@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:racepace/application/calculator/calculator_repository.dart';
 import 'package:racepace/application/calculator/calculator_service.dart';
+import 'package:racepace/application/splits/splits_presets_repository.dart';
+import 'package:racepace/application/splits/splits_presets_service.dart';
 import 'package:racepace/application/settings/settings_repository.dart';
 import 'package:racepace/application/settings/settings_service.dart';
 import 'package:racepace/domain/calculator/calculation.dart';
 import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/domain/splits/splits_preset.dart';
 import 'package:racepace/presentation/app/calculator_scope.dart';
 import 'package:racepace/presentation/app/settings_scope.dart';
+import 'package:racepace/presentation/app/splits_presets_scope.dart';
 import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 import 'package:racepace/presentation/l10n/app_localizations.dart';
 
@@ -17,16 +21,21 @@ SettingsNotifier createTestSettingsNotifier({AppSettings? settings}) {
   return notifier;
 }
 
-CalculatorService createTestCalculatorService({
-  List<Calculation>? seed,
-}) {
+CalculatorService createTestCalculatorService({List<Calculation>? seed}) {
   return CalculatorService(FakeCalculatorRepository(seed: seed));
+}
+
+SplitsPresetsService createTestSplitsPresetsService({
+  List<SplitsPreset>? seed,
+}) {
+  return SplitsPresetsService(FakeSplitsPresetsRepository(seed: seed));
 }
 
 Widget buildTestApp({
   required Widget child,
   SettingsNotifier? settingsNotifier,
   CalculatorService? calculatorService,
+  SplitsPresetsService? splitsPresetsService,
 }) {
   Widget wrapped = child;
   if (calculatorService != null) {
@@ -35,6 +44,10 @@ Widget buildTestApp({
   if (settingsNotifier != null) {
     wrapped = SettingsScope(controller: settingsNotifier, child: wrapped);
   }
+  wrapped = SplitsPresetsScope(
+    service: splitsPresetsService ?? createTestSplitsPresetsService(),
+    child: wrapped,
+  );
 
   return CupertinoApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -46,12 +59,13 @@ Widget buildTestApp({
 
 class FakeSettingsRepository implements SettingsRepository {
   FakeSettingsRepository({AppSettings? settings})
-      : _settings = settings ??
-            const AppSettings(
-              unit: AppSettings.defaultUnit,
-              language: AppSettings.defaultLanguage,
-              theme: AppSettings.defaultTheme,
-            );
+    : _settings =
+          settings ??
+          const AppSettings(
+            unit: AppSettings.defaultUnit,
+            language: AppSettings.defaultLanguage,
+            theme: AppSettings.defaultTheme,
+          );
 
   AppSettings _settings;
 
@@ -76,7 +90,7 @@ class FakeSettingsRepository implements SettingsRepository {
 
 class FakeCalculatorRepository implements CalculatorRepository {
   FakeCalculatorRepository({List<Calculation>? seed})
-      : _entries = List.of(seed ?? const []);
+    : _entries = List.of(seed ?? const []);
 
   final List<Calculation> _entries;
   int _nextId = 1;
@@ -102,5 +116,26 @@ class FakeCalculatorRepository implements CalculatorRepository {
   @override
   Future<void> deleteCalculation(int id) async {
     _entries.removeWhere((entry) => entry.id == id);
+  }
+}
+
+class FakeSplitsPresetsRepository implements SplitsPresetsRepository {
+  FakeSplitsPresetsRepository({List<SplitsPreset>? seed})
+    : _presets = List.of(seed ?? const []);
+
+  final List<SplitsPreset> _presets;
+
+  @override
+  Future<void> deletePreset(int id) async {
+    _presets.removeWhere((preset) => preset.id == id);
+  }
+
+  @override
+  Future<List<SplitsPreset>> loadPresets() async => List.of(_presets);
+
+  @override
+  Future<void> savePreset(SplitsPreset preset) async {
+    _presets.removeWhere((item) => item.id == preset.id);
+    _presets.insert(0, preset);
   }
 }

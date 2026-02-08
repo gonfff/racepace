@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:racepace/domain/settings/app_settings.dart';
+import 'package:racepace/domain/splits/splits_preset.dart';
+import 'package:racepace/presentation/app/splits_presets_scope.dart';
 import 'package:racepace/presentation/core/design/app_theme.dart';
 import 'package:racepace/presentation/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
@@ -25,7 +27,12 @@ class SplitsScreen extends StatefulWidget {
   final Duration pace;
   final Duration time;
   final Unit unit;
-  final void Function(double distance, Duration pace, Duration time)?
+  final void Function(
+    SplitValueField field,
+    double distance,
+    Duration pace,
+    Duration time,
+  )?
   onValuesChanged;
 
   @override
@@ -47,6 +54,8 @@ class _SplitsScreenState extends State<SplitsScreen> {
   double _distance = 0;
   Duration _pace = Duration.zero;
   Duration _time = Duration.zero;
+  final List<SplitsPreset> _presets = [];
+  bool _presetsLoaded = false;
 
   @override
   void initState() {
@@ -57,6 +66,14 @@ class _SplitsScreenState extends State<SplitsScreen> {
     _distance = widget.distance;
     _pace = widget.pace;
     _time = widget.time;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_presetsLoaded) return;
+    _presetsLoaded = true;
+    _loadPresets();
   }
 
   @override
@@ -83,8 +100,49 @@ class _SplitsScreenState extends State<SplitsScreen> {
     setState(update);
   }
 
-  void _emitValuesChanged() {
-    widget.onValuesChanged?.call(_distance, _pace, _time);
+  Future<void> _loadPresets() async {
+    final service = SplitsPresetsScope.of(context);
+    final presets = await service.loadPresets();
+    if (!mounted) return;
+    setState(() {
+      _presets
+        ..clear()
+        ..addAll(presets);
+    });
+  }
+
+  void _emitValuesChanged(SplitValueField field) {
+    widget.onValuesChanged?.call(field, _distance, _pace, _time);
+  }
+
+  Future<void> _savePreset() async {
+    final preset = SplitsPreset(
+      id: DateTime.now().millisecondsSinceEpoch,
+      intervalCode: _splitIntervalCode(_selectedInterval),
+      strategyPercent: _strategyPercent,
+    );
+    final service = SplitsPresetsScope.of(context);
+    await service.savePreset(preset);
+    if (!mounted) return;
+    await _loadPresets();
+  }
+
+  void _openPresets(AppLocalizations localizations) {
+    showCupertinoModalPopup<SplitsPreset>(
+      context: context,
+      builder: (context) =>
+          _PresetsSheet(presets: _presets, fallbackInterval: _selectedInterval),
+    ).then((preset) async {
+      if (!mounted) return;
+      await _loadPresets();
+      if (preset == null) return;
+      final interval =
+          _splitIntervalFromCode(preset.intervalCode) ?? _selectedInterval;
+      _updateSplitsState(() {
+        _selectedInterval = interval;
+        _strategyPercent = preset.strategyPercent;
+      });
+    });
   }
 
   String _formattedStartTime() {
@@ -164,7 +222,7 @@ class _SplitsScreenState extends State<SplitsScreen> {
                       label: unitShortLabel,
                       onTap: () => _openValueInputDialog(
                         context,
-                        _SplitValueField.distance,
+                        SplitValueField.distance,
                       ),
                     ),
                   ),
@@ -175,7 +233,7 @@ class _SplitsScreenState extends State<SplitsScreen> {
                       value: _formatDuration(_pace),
                       label: paceUnitLabel,
                       onTap: () =>
-                          _openValueInputDialog(context, _SplitValueField.pace),
+                          _openValueInputDialog(context, SplitValueField.pace),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -185,16 +243,17 @@ class _SplitsScreenState extends State<SplitsScreen> {
                       value: _formatDuration(_time),
                       label: localizations.calculatorTimeFormat,
                       onTap: () =>
-                          _openValueInputDialog(context, _SplitValueField.time),
+                          _openValueInputDialog(context, SplitValueField.time),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     localizations.splitsSettingsTitle,
@@ -237,7 +296,6 @@ class _SplitsScreenState extends State<SplitsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
                   Text(
                     _strategyDescription(localizations, _strategyPercent),
                     style: const TextStyle(
@@ -245,7 +303,38 @@ class _SplitsScreenState extends State<SplitsScreen> {
                       color: CupertinoColors.systemGrey,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                        minimumSize: const Size(28, 28),
+                        onPressed: () => _openPresets(localizations),
+                        child: Text(localizations.splitsPresetsButton),
+                      ),
+                      const Spacer(),
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                        minimumSize: const Size(28, 28),
+                        onPressed: _savePreset,
+                        child: Text(localizations.calculatorSave),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                children: [
                   _SplitsTable(
                     splits: splits,
                     unitShortLabel: unitShortLabel,

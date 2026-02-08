@@ -154,27 +154,27 @@ extension _SplitsScreenDialogs on _SplitsScreenState {
 
   Future<void> _openValueInputDialog(
     BuildContext context,
-    _SplitValueField field,
+    SplitValueField field,
   ) async {
     final localizations = AppLocalizations.of(context);
     final unitShortLabel = _unitShortLabel(localizations, widget.unit);
     final paceUnitLabel = '${localizations.unitMinutesShort}/$unitShortLabel';
     final initialText = switch (field) {
-      _SplitValueField.distance => _formatNumber(_distance),
-      _SplitValueField.pace => _formatDuration(_pace),
-      _SplitValueField.time => _formatDuration(_time),
+      SplitValueField.distance => _formatNumber(_distance),
+      SplitValueField.pace => _formatDuration(_pace),
+      SplitValueField.time => _formatDuration(_time),
     };
     final controller = TextEditingController(
-      text: field == _SplitValueField.distance
+      text: field == SplitValueField.distance
           ? initialText
           : _TimeTextInputFormatter.format(
               _digitsOnly(initialText),
-              allowHours: field == _SplitValueField.time,
+              allowHours: field == SplitValueField.time,
             ),
     );
-    final isTimeField = field == _SplitValueField.time;
-    final isPaceField = field == _SplitValueField.pace;
-    final isDistanceField = field == _SplitValueField.distance;
+    final isTimeField = field == SplitValueField.time;
+    final isPaceField = field == SplitValueField.pace;
+    final isDistanceField = field == SplitValueField.distance;
     final inputFormatters = <TextInputFormatter>[
       if (isTimeField || isPaceField)
         _TimeTextInputFormatter(allowHours: isTimeField)
@@ -182,14 +182,14 @@ extension _SplitsScreenDialogs on _SplitsScreenState {
         _DistanceTextInputFormatter(),
     ];
     final placeholder = switch (field) {
-      _SplitValueField.distance => '0.0',
-      _SplitValueField.pace => '__:__',
-      _SplitValueField.time => '__:__:__',
+      SplitValueField.distance => '0.0',
+      SplitValueField.pace => '__:__',
+      SplitValueField.time => '__:__:__',
     };
     final title = switch (field) {
-      _SplitValueField.distance => localizations.calculatorDistance,
-      _SplitValueField.pace => localizations.calculatorPace,
-      _SplitValueField.time => localizations.calculatorTime,
+      SplitValueField.distance => localizations.calculatorDistance,
+      SplitValueField.pace => localizations.calculatorPace,
+      SplitValueField.time => localizations.calculatorTime,
     };
     const inputFieldHeight = 44.0;
     var distanceValue = _clampDistance(_distance);
@@ -533,15 +533,15 @@ extension _SplitsScreenDialogs on _SplitsScreenState {
               onChanged: (_) => syncWheelFromField(),
             );
             final picker = switch (field) {
-              _SplitValueField.distance => buildDistancePicker(
+              SplitValueField.distance => buildDistancePicker(
                 setState,
                 syncTextFromWheel,
               ),
-              _SplitValueField.pace => buildPacePicker(
+              SplitValueField.pace => buildPacePicker(
                 setState,
                 syncTextFromWheel,
               ),
-              _SplitValueField.time => buildTimePicker(
+              SplitValueField.time => buildTimePicker(
                 setState,
                 syncTextFromWheel,
               ),
@@ -601,29 +601,44 @@ extension _SplitsScreenDialogs on _SplitsScreenState {
 
     _updateSplitsState(() {
       switch (field) {
-        case _SplitValueField.distance:
+        case SplitValueField.distance:
           final value = double.tryParse(trimmed);
           if (value == null || value <= 0) return;
           _distance = _clampDistance(value);
+          if (_pace.inSeconds > 0) {
+            _time = _clampTime(
+              Duration(seconds: (_distance * _pace.inSeconds).round()),
+            );
+          }
           break;
-        case _SplitValueField.pace:
+        case SplitValueField.pace:
           final paceDigits = _digitsOnly(trimmed);
           if (paceDigits.isEmpty) return;
           final pace = _durationFromDigits(paceDigits, allowHours: false);
           if (pace == null) return;
           _pace = _clampPace(pace);
+          if (_distance > 0) {
+            _time = _clampTime(
+              Duration(seconds: (_distance * _pace.inSeconds).round()),
+            );
+          }
           break;
-        case _SplitValueField.time:
+        case SplitValueField.time:
           final timeDigits = _digitsOnly(trimmed);
           if (timeDigits.isEmpty) return;
           final time = _durationFromDigits(timeDigits, allowHours: true);
           if (time == null) return;
           _time = _clampTime(time);
+          if (_distance > 0) {
+            _pace = _clampPace(
+              Duration(seconds: (_time.inSeconds / _distance).round()),
+            );
+          }
           break;
       }
     });
 
     disposeControllers();
-    _emitValuesChanged();
+    _emitValuesChanged(field);
   }
 }

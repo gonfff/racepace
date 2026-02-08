@@ -386,6 +386,24 @@ abstract class AppLocalizations {
   /// **'Split settings'**
   String get splitsSettingsTitle;
 
+  /// No description provided for @splitsPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Split presets'**
+  String get splitsPresets;
+
+  /// No description provided for @splitsPresetsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Presets'**
+  String get splitsPresetsButton;
+
+  /// No description provided for @splitsPresetsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No presets yet'**
+  String get splitsPresetsEmpty;
+
   /// No description provided for @splitsIntervalTitle.
   ///
   /// In en, this message translates to:

@@ -75,6 +75,276 @@ class _SettingsBlock extends StatelessWidget {
   }
 }
 
+class _PresetsSheet extends StatefulWidget {
+  const _PresetsSheet({required this.presets, required this.fallbackInterval});
+
+  final List<SplitsPreset> presets;
+  final _SplitInterval fallbackInterval;
+
+  @override
+  State<_PresetsSheet> createState() => _PresetsSheetState();
+}
+
+class _PresetsSheetState extends State<_PresetsSheet> {
+  late final List<SplitsPreset> _items = List.of(widget.presets);
+  double _dragOffset = 0;
+  bool _isDragging = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    final sheetHeight = MediaQuery.sizeOf(context).height * 0.5;
+    final closeLabel = AppLocalizations.of(context).settingsClose;
+
+    return SafeArea(
+      top: true,
+      bottom: false,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: AnimatedContainer(
+          duration: _isDragging
+              ? Duration.zero
+              : const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          transform: Matrix4.translationValues(0, _dragOffset, 0),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            child: Container(
+              height: sheetHeight,
+              decoration: BoxDecoration(
+                color: AppTheme.scaffoldBackgroundColor(context),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: CupertinoColors.black.withValues(alpha: 0.12),
+                    blurRadius: 24,
+                    offset: const Offset(0, -6),
+                  ),
+                ],
+              ),
+              width: double.infinity,
+              child: Column(
+                children: [
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onVerticalDragUpdate: (details) {
+                      final nextOffset = _dragOffset + details.delta.dy;
+                      if (nextOffset < 0) return;
+                      setState(() {
+                        _isDragging = true;
+                        _dragOffset = nextOffset;
+                      });
+                    },
+                    onVerticalDragEnd: (_) {
+                      if (_dragOffset > 90) {
+                        Navigator.of(context).pop();
+                        return;
+                      }
+                      setState(() {
+                        _isDragging = false;
+                        _dragOffset = 0;
+                      });
+                    },
+                    onVerticalDragCancel: () {
+                      setState(() {
+                        _isDragging = false;
+                        _dragOffset = 0;
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          width: 44,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: CupertinoColors.systemGrey4.resolveFrom(
+                              context,
+                            ),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: CupertinoButton(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 6,
+                                  ),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(closeLabel),
+                                ),
+                              ),
+                              Text(
+                                localizations.splitsPresets,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: _items.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24),
+                              child: Text(
+                                localizations.splitsPresetsEmpty,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: CupertinoColors.systemGrey,
+                                ),
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                            itemCount: _items.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final preset = _items[index];
+                              return Dismissible(
+                                key: ValueKey('preset_${preset.id}'),
+                                direction: DismissDirection.endToStart,
+                                background: const SizedBox.shrink(),
+                                secondaryBackground: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                  ),
+                                  alignment: Alignment.centerRight,
+                                  decoration: BoxDecoration(
+                                    color: CupertinoColors.systemRed,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const Icon(
+                                    CupertinoIcons.trash,
+                                    color: CupertinoColors.white,
+                                  ),
+                                ),
+                                onDismissed: (_) async {
+                                  final service = SplitsPresetsScope.of(
+                                    context,
+                                  );
+                                  await service.deletePreset(preset.id);
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _items.removeWhere(
+                                      (item) => item.id == preset.id,
+                                    );
+                                  });
+                                },
+                                child: _PresetCard(
+                                  preset: preset,
+                                  content: _presetRowWidget(
+                                    localizations,
+                                    preset,
+                                    widget.fallbackInterval,
+                                  ),
+                                  onSelect: () =>
+                                      Navigator.of(context).pop(preset),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PresetCard extends StatelessWidget {
+  const _PresetCard({
+    required this.preset,
+    required this.content,
+    required this.onSelect,
+  });
+
+  final SplitsPreset preset;
+  final Widget content;
+  final VoidCallback onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onSelect,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppTheme.cardBackgroundColor(context),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: CupertinoColors.systemGrey4.resolveFrom(context),
+          ),
+        ),
+        child: Row(children: [Expanded(child: content)]),
+      ),
+    );
+  }
+}
+
+Widget _presetRowWidget(
+  AppLocalizations localizations,
+  SplitsPreset preset,
+  _SplitInterval fallbackInterval,
+) {
+  final interval =
+      _splitIntervalFromCode(preset.intervalCode) ?? fallbackInterval;
+  final intervalLabel = interval.label(localizations);
+  final strategyLabel = _strategyTileLabel(
+    localizations,
+    preset.strategyPercent,
+  );
+  return Row(
+    children: [
+      Expanded(
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            intervalLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.left,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            strategyLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
 class _ValueCard extends StatelessWidget {
   const _ValueCard({
     super.key,

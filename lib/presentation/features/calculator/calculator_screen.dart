@@ -251,16 +251,28 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                               pace: pace,
                               time: time,
                               unit: unit,
-                              onValuesChanged: (newDistance, newPace, newTime) {
-                                _isUpdating = true;
-                                _distanceController.text = _formatNumber(
-                                  newDistance,
-                                );
-                                _paceController.text = _formatDuration(newPace);
-                                _timeController.text = _formatDuration(newTime);
-                                _isUpdating = false;
-                                setState(() {});
-                              },
+                              onValuesChanged:
+                                  (field, newDistance, newPace, newTime) {
+                                    final primary = _calcFieldFromSplit(field);
+                                    final secondary = _secondaryField(primary);
+                                    _isUpdating = true;
+                                    _distanceController.text = _formatNumber(
+                                      newDistance,
+                                    );
+                                    _paceController.text = _formatDuration(
+                                      newPace,
+                                    );
+                                    _timeController.text = _formatDuration(
+                                      newTime,
+                                    );
+                                    _isUpdating = false;
+                                    _lastChanged
+                                      ..clear()
+                                      ..add(primary)
+                                      ..add(secondary);
+                                    _recalculateFromLastTwo();
+                                    setState(() {});
+                                  },
                             ),
                           ),
                         );
@@ -449,6 +461,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
     if (!mounted) return;
     setState(() {
+      _entries.removeWhere((entry) => entry.id == saved.id);
       _entries.insert(0, saved);
     });
   }
@@ -523,6 +536,28 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       return _CalcField.pace;
     }
     return _CalcField.distance;
+  }
+
+  _CalcField _calcFieldFromSplit(SplitValueField field) {
+    switch (field) {
+      case SplitValueField.distance:
+        return _CalcField.distance;
+      case SplitValueField.pace:
+        return _CalcField.pace;
+      case SplitValueField.time:
+        return _CalcField.time;
+    }
+  }
+
+  _CalcField _secondaryField(_CalcField primary) {
+    switch (primary) {
+      case _CalcField.distance:
+        return _CalcField.pace;
+      case _CalcField.pace:
+        return _CalcField.distance;
+      case _CalcField.time:
+        return _CalcField.distance;
+    }
   }
 
   _CalculationValues? _calculateValues() {

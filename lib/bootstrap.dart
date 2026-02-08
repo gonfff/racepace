@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:racepace/application/calculator/calculator_service.dart';
+import 'package:racepace/application/splits/splits_presets_service.dart';
 import 'package:racepace/application/settings/settings_service.dart';
 import 'package:racepace/infrastructure/calculator/calculator_repository_local.dart';
 import 'package:racepace/infrastructure/database/app_database.dart';
 import 'package:racepace/infrastructure/settings/settings_repository_local.dart';
+import 'package:racepace/infrastructure/splits/splits_presets_repository_local.dart';
 import 'package:racepace/presentation/app/racepace_app.dart';
 import 'package:racepace/presentation/features/settings/settings_notifier.dart';
 
@@ -15,12 +17,15 @@ Future<Widget> bootstrap() async {
   final notifier = SettingsNotifier(service);
   final calculatorRepository = CalculatorRepositoryLocal(database);
   final calculatorService = CalculatorService(calculatorRepository);
+  final splitsPresetsRepository = SplitsPresetsRepositoryLocal(database);
+  final splitsPresetsService = SplitsPresetsService(splitsPresetsRepository);
   await notifier.load();
 
   return _AppBootstrap(
     database: database,
     settingsNotifier: notifier,
     calculatorService: calculatorService,
+    splitsPresetsService: splitsPresetsService,
   );
 }
 
@@ -29,11 +34,13 @@ class _AppBootstrap extends StatefulWidget {
     required this.database,
     required this.settingsNotifier,
     required this.calculatorService,
+    required this.splitsPresetsService,
   });
 
   final AppDatabase database;
   final SettingsNotifier settingsNotifier;
   final CalculatorService calculatorService;
+  final SplitsPresetsService splitsPresetsService;
 
   @override
   State<_AppBootstrap> createState() => _AppBootstrapState();
@@ -52,6 +59,7 @@ class _AppBootstrapState extends State<_AppBootstrap> {
     return RacepaceApp(
       settingsNotifier: widget.settingsNotifier,
       calculatorService: widget.calculatorService,
+      splitsPresetsService: widget.splitsPresetsService,
     );
   }
 }

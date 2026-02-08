@@ -153,6 +153,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splitsSettingsTitle => 'Split settings';
 
   @override
+  String get splitsPresets => 'Split presets';
+
+  @override
+  String get splitsPresetsButton => 'Presets';
+
+  @override
+  String get splitsPresetsEmpty => 'No presets yet';
+
+  @override
   String get splitsIntervalTitle => 'Split interval';
 
   @override

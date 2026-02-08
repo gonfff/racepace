@@ -153,6 +153,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get splitsSettingsTitle => 'Настройки сплитов';
 
   @override
+  String get splitsPresets => 'Пресеты сплитов';
+
+  @override
+  String get splitsPresetsButton => 'Пресеты';
+
+  @override
+  String get splitsPresetsEmpty => 'Пока нет пресетов';
+
+  @override
   String get splitsIntervalTitle => 'Интервал';
 
   @override
