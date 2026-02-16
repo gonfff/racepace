@@ -10,10 +10,14 @@ class SplitsPresetsScope extends InheritedWidget {
 
   final SplitsPresetsService service;
 
-  static SplitsPresetsService of(BuildContext context) {
+  static SplitsPresetsService? maybeOf(BuildContext context) {
     final scope = context
         .dependOnInheritedWidgetOfExactType<SplitsPresetsScope>();
-    final service = scope?.service;
+    return scope?.service;
+  }
+
+  static SplitsPresetsService of(BuildContext context) {
+    final service = maybeOf(context);
     assert(service != null, 'SplitsPresetsScope not found in widget tree.');
     return service!;
   }

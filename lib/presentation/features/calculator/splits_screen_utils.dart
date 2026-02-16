@@ -34,6 +34,7 @@ List<_SplitRow> _buildSplits({
   required int strategyPercent,
   required Duration startTime,
 }) {
+  const epsilon = 1e-9;
   if (distance <= 0) return [];
   final intervalDistance = _intervalDistanceInUnit(interval, unit);
   if (intervalDistance <= 0) return [];
@@ -44,7 +45,7 @@ List<_SplitRow> _buildSplits({
   final splits = <_SplitRow>[];
   var index = 1;
 
-  while (remaining > 0) {
+  while (remaining > epsilon) {
     final splitDistance = remaining >= intervalDistance
         ? intervalDistance
         : remaining;
@@ -53,8 +54,8 @@ List<_SplitRow> _buildSplits({
     final splitPaceSeconds = basePaceSeconds * paceFactor;
     final splitSeconds = splitPaceSeconds * splitDistance;
     elapsedSeconds += splitSeconds;
-    covered += splitDistance;
-    remaining -= splitDistance;
+    covered = (covered + splitDistance).clamp(0.0, distance).toDouble();
+    remaining = (remaining - splitDistance).clamp(0.0, distance).toDouble();
 
     final paceDuration = Duration(seconds: splitPaceSeconds.round());
     final elapsedDuration = Duration(seconds: elapsedSeconds.round());

@@ -101,7 +101,8 @@ class _SplitsScreenState extends State<SplitsScreen> {
   }
 
   Future<void> _loadPresets() async {
-    final service = SplitsPresetsScope.of(context);
+    final service = SplitsPresetsScope.maybeOf(context);
+    if (service == null) return;
     final presets = await service.loadPresets();
     if (!mounted) return;
     setState(() {
@@ -116,12 +117,13 @@ class _SplitsScreenState extends State<SplitsScreen> {
   }
 
   Future<void> _savePreset() async {
+    final service = SplitsPresetsScope.maybeOf(context);
+    if (service == null) return;
     final preset = SplitsPreset(
       id: DateTime.now().millisecondsSinceEpoch,
       intervalCode: _splitIntervalCode(_selectedInterval),
       strategyPercent: _strategyPercent,
     );
-    final service = SplitsPresetsScope.of(context);
     await service.savePreset(preset);
     if (!mounted) return;
     await _loadPresets();

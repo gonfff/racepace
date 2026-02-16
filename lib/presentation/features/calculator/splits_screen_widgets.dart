@@ -237,9 +237,10 @@ class _PresetsSheetState extends State<_PresetsSheet> {
                                   ),
                                 ),
                                 onDismissed: (_) async {
-                                  final service = SplitsPresetsScope.of(
+                                  final service = SplitsPresetsScope.maybeOf(
                                     context,
                                   );
+                                  if (service == null) return;
                                   await service.deletePreset(preset.id);
                                   if (!mounted) return;
                                   setState(() {
